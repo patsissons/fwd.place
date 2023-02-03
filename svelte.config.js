@@ -12,6 +12,7 @@ const config = {
 
     alias: {
       'components/*': 'src/lib/components/*',
+      'config/*': 'src/lib/config/*',
       'context/*': 'src/lib/context/*',
       'data/*': 'src/lib/data/*',
       'foundation/*': 'src/lib/foundation/*',
