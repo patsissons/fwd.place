@@ -1,12 +1,16 @@
 <script lang="ts">
   import { createAppContext } from 'context/app'
   import type { LoadContext } from 'context/load'
+  import { createPageContext, type PageContextData } from 'context/page'
   import 'styles/global.css'
 
   export let load: LoadContext
+  export let page: PageContextData | undefined = undefined
 
-  const context = createAppContext(load)
-  const staging = context.routing.staging
+  const appContext = createAppContext(load)
+  createPageContext(page)
+
+  const staging = appContext.routing.staging
 </script>
 
 <svelte:head>

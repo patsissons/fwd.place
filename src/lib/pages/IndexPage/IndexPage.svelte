@@ -1,44 +1,47 @@
 <script lang="ts">
   import { page } from '$app/stores'
-  import Card from 'components/Card.svelte'
-  import { Content, Heading } from './components'
+  import { getPageContext } from 'context/page'
+  import type { Forward } from 'thin-backend'
+  import { Form, InvalidRedirect, Welcome } from './components'
 
-  export let data: unknown = undefined
+  const params = $page.url.searchParams
+  const editId = params.get('id')
+  const editName = params.get('name') || undefined
+  const editUrl = params.get('url') || undefined
 
-  const {
-    url: { searchParams },
-  } = $page
-  let invalidRedirect = searchParams.get('error')
-  let invalidRedirectReason = searchParams.get('reason')
+  const pageContext = getPageContext()
+  const view = pageContext.store<string>('view')
+
+  function nameEligible(name: string) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        if (name === 'testing') {
+          reject(`'${name}' is not available`)
+        } else {
+          resolve(true)
+        }
+      }, 500 + Math.random() * 5000)
+    })
+  }
+
+  function onSubmit(name: string, url: string) {
+    return new Promise<Forward>((_, reject) => {
+      setTimeout(
+        () => reject('Almost ready, try again real soon'),
+        500 + Math.random() * 5000
+      )
+    })
+  }
+
+  function onClose() {
+    view.set('')
+  }
 </script>
 
-{#if invalidRedirect}
-  <div class="alert alert-error shadow-lg mb-4 max-w-5xl mx-auto">
-    <div>
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="stroke-current flex-shrink-0 h-6 w-6"
-        fill="none"
-        viewBox="0 0 24 24"
-        ><path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-        /></svg
-      >
-      <span
-        >{invalidRedirect} is not a valid redirect{invalidRedirectReason
-          ? ` (${invalidRedirectReason})`
-          : ''}</span
-      >
-    </div>
-  </div>
-{/if}
+<InvalidRedirect />
 
-<Card>
-  <span slot="title">
-    <Heading />
-  </span>
-  <Content {data} />
-</Card>
+{#if $view === 'create'}
+  <Form {editName} {editUrl} {nameEligible} {onSubmit} {onClose} />
+{:else}
+  <Welcome />
+{/if}
