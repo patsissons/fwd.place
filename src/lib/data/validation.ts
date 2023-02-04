@@ -1,6 +1,3 @@
-import { isDevelopment } from 'config/env'
-import { isStaging } from 'utils/url'
-
 export const predicates = {
   empty(value: string) {
     if (!value) return true
@@ -32,15 +29,16 @@ export const validators = {
     return 'formatted incorrectly'
   },
   nameDenied(value: string) {
-    if (!nameDenySet.has(value)) return
-
-    return `cannot be one of the following: ${Array.from(nameDenySet).join(
-      ', '
-    )}`
+    if (nameDenySet.has(value))
+      return `cannot be one of the following: ${Array.from(nameDenySet).join(
+        ', '
+      )}`
+    if (value.indexOf('/') >= 0) return `cannot include '/'`
   },
   urlDenied(value: string) {
     // assume we've already validate the url
     const url = new URL(value)
+    const parts = url.host.split('.')
 
     if (url.host.endsWith('fwd.place'))
       return 'forwards to this site are not permitted'
@@ -50,6 +48,7 @@ export const validators = {
       ).join(', ')}`
     if (url.host.startsWith('127.'))
       return 'host cannot be in the 127.0.0.0/8 CIDR'
+    if (parts.length < 2) return 'host cannot be a naked top level domain'
   },
 }
 
@@ -84,13 +83,3 @@ export const validation = {
     return value
   },
 } satisfies Record<string, (value: string) => string>
-
-export type ThinDBEnvironment = 'production' | 'staging' | 'development'
-
-export function dbEnvironment(url: URL): ThinDBEnvironment {
-  if (isDevelopment) {
-    return 'development'
-  }
-
-  return isStaging(url) ? 'staging' : 'production'
-}

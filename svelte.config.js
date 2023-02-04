@@ -11,6 +11,7 @@ const config = {
     adapter: adapter(),
 
     alias: {
+      'client/*': 'src/lib/client/*',
       'components/*': 'src/lib/components/*',
       'config/*': 'src/lib/config/*',
       'context/*': 'src/lib/context/*',

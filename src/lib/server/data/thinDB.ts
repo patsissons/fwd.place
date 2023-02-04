@@ -6,13 +6,9 @@ import {
   type Forward,
 } from 'thin-backend'
 import jwt from 'jsonwebtoken'
-import { validation, type ThinDBEnvironment } from 'data/thinDB'
-import {
-  JWT_ISSUER,
-  JWT_PRIVATE_KEY,
-  JWT_SUBJECT,
-  THIN_BACKEND_HOST,
-} from 'config/env'
+import { JWT_PRIVATE_KEY, JWT_SUBJECT, THIN_BACKEND_HOST } from 'config/env'
+import type { ThinDBEnvironment } from 'data/env'
+import { validation } from 'data/validation'
 
 // DataSyncController isn't exposed by default, so we'll augment the module with
 // minimal types to support JWT auth signed in the API backend.
@@ -25,15 +21,18 @@ declare module 'thin-backend' {
 
 const defaultEnvironment: ThinDBEnvironment = 'production'
 const secondsPerDay = 60 * 60 * 24
+const iss = 'https://fwd.place'
 
 export function getJWT() {
+  if (!JWT_PRIVATE_KEY) throw new Error('Unable to sign access token')
+
   const iat = Math.floor(Date.now() / 1000)
 
   return jwt.sign(
     {
       iat,
       exp: iat + 1 * secondsPerDay,
-      iss: JWT_ISSUER,
+      iss,
       sub: JWT_SUBJECT,
     },
     JWT_PRIVATE_KEY,
@@ -42,27 +41,23 @@ export function getJWT() {
 }
 
 export function initialize() {
-  if (!DataSyncController.ihpBackendHost) {
-    DataSyncController.ihpBackendHost = THIN_BACKEND_HOST
-    DataSyncController.getJWT = getJWT
-  }
+  if (!THIN_BACKEND_HOST) throw new Error('Invalid database configuration')
+
+  DataSyncController.ihpBackendHost = THIN_BACKEND_HOST
+  DataSyncController.getJWT = getJWT
 }
 
-export async function urlByName(
+export function urlByName(
   name: string,
   environment = defaultEnvironment
 ): Promise<Pick<Forward, 'url'> | null> {
   initialize()
 
-  const result = await query('forwards')
+  return query('forwards')
     .where('name', name)
     .where('environment', environment)
     .select('url')
-    .fetch()
-
-  console.log('D', { result })
-
-  return result[0]
+    .fetchOne()
 }
 
 export function createForward(
@@ -74,7 +69,7 @@ export function createForward(
 
   return createRecord('forwards', {
     name: validation.name(name),
-    url: validation.name(url),
+    url: validation.url(url),
     environment,
   })
 }
@@ -84,7 +79,11 @@ export interface UpdateForwardOptions {
   url?: string
 }
 
-export function updateForward(id: string, options: UpdateForwardOptions) {
+export async function updateForward(
+  options: UpdateForwardOptions,
+  { id, ...original }: Pick<Forward, 'id' | 'name' | 'url'>,
+  environment = defaultEnvironment
+) {
   initialize()
 
   const name = options.name ? validation.name(options.name) : undefined
@@ -92,8 +91,21 @@ export function updateForward(id: string, options: UpdateForwardOptions) {
 
   if (!name && !url) throw new Error('Nothing to update')
 
+  const current = await query('forwards')
+    .where('id', id)
+    .where('environment', environment)
+    .select('name', 'url')
+    .fetchOne()
+  if (
+    !current ||
+    current.name !== original.name ||
+    current.url !== original.url
+  )
+    throw new Error('Unauthorized update')
+
   return updateRecord('forwards', id, {
     name,
     url,
+    updatedAt: new Date().toISOString(),
   })
 }

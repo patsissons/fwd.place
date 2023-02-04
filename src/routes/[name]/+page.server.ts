@@ -1,5 +1,5 @@
-import { dbEnvironment } from '$lib/data/thinDB'
 import { redirect } from '@sveltejs/kit'
+import { dbEnvironment } from 'data/env'
 import { urlByName } from 'server/data/thinDB'
 import { log } from 'utils/logging'
 import { errorReason, isRedirect } from 'utils/error'

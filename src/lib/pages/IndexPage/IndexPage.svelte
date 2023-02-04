@@ -1,41 +1,43 @@
 <script lang="ts">
   import { page } from '$app/stores'
+  import { create, eligible, update } from 'client/api'
   import { getPageContext } from 'context/page'
-  import type { Forward } from 'thin-backend'
+  import { onMount } from 'svelte'
   import { Form, InvalidRedirect, Welcome } from './components'
 
-  const params = $page.url.searchParams
-  const editId = params.get('id')
-  const editName = params.get('name') || undefined
-  const editUrl = params.get('url') || undefined
+  $: params = $page.url.searchParams
+  $: editId = params.get('id') || undefined
+  $: editName = params.get('name') || undefined
+  $: editUrl = params.get('url') || undefined
 
   const pageContext = getPageContext()
   const view = pageContext.store<string>('view')
 
   function nameEligible(name: string) {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        if (name === 'testing') {
-          reject(`'${name}' is not available`)
-        } else {
-          resolve(true)
-        }
-      }, 500 + Math.random() * 5000)
-    })
+    return eligible(name)
   }
 
   function onSubmit(name: string, url: string) {
-    return new Promise<Forward>((_, reject) => {
-      setTimeout(
-        () => reject('Almost ready, try again real soon'),
-        500 + Math.random() * 5000
-      )
-    })
+    if (editId) {
+      if (!editName || !editUrl) {
+        throw new Error('Invalid edit link')
+      }
+
+      return update(name, url, { id: editId, name: editName, url: editUrl })
+    }
+
+    return create(name, url)
   }
 
   function onClose() {
     view.set('')
   }
+
+  onMount(() => {
+    if (editId && editName && editUrl) {
+      view.set('create')
+    }
+  })
 </script>
 
 <InvalidRedirect />

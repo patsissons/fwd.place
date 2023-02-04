@@ -1,6 +1,7 @@
 <script lang="ts">
+  import { goto } from '$app/navigation'
   import Card from 'components/Card.svelte'
-  import { validation } from 'data/thinDB'
+  import { validation } from 'data/validation'
   import type { Forward } from 'thin-backend'
   import { errorReason } from 'utils/error'
 
@@ -18,7 +19,7 @@
   let url: string = editUrl || '',
     urlError: string | undefined,
     validatingUrl = false
-  let error: unknown
+  let error: string | undefined
   let success: Forward | undefined
   let saving = false
 
@@ -35,7 +36,8 @@
 
       validation.name(name)
 
-      await nameEligible(name)
+      if (name !== editName) await nameEligible(name)
+
       nameValidated = true
     } catch (err) {
       nameError = errorReason(err)
@@ -64,6 +66,11 @@
       saving = true
       error = undefined
       success = await onSubmit(name, url)
+      goto(`/?id=${success.id}&name=${success.name}&url=${success.url}`, {
+        keepFocus: true,
+        noScroll: true,
+        replaceState: true,
+      })
     } catch (err) {
       error = errorReason(err)
       success = undefined
@@ -114,9 +121,9 @@
           disabled={saving || validatingName}
         />
         {#if validatingName}
-          <button class="btn btn-ghost disabled loading" />
+          <div class="btn btn-ghost loading pointer-events-none" />
         {:else if nameValidated}
-          <button class="btn disabled btn-success">
+          <div class="btn btn-success pointer-events-none">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               class="stroke-current flex-shrink-0 h-6 w-6"
@@ -129,9 +136,9 @@
                 d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-          </button>
+          </div>
         {:else if nameError}
-          <button class="btn disabled btn-error">
+          <div class="btn btn-error pointer-events-none">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               class="stroke-current flex-shrink-0 h-6 w-6"
@@ -144,7 +151,7 @@
                 d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-          </button>
+          </div>
         {/if}
       </div>
       {#if nameError}
@@ -176,10 +183,10 @@
       class="w-full btn btn-primary">Save changes</button
     >
     {#if error}
-      <p class="text-error">{errorReason(error)}</p>
+      <p class="text-error">{error}</p>
     {:else if success}
       <div class="flex flex-col gap-4">
-        <div class="flex justify-between gap-4">
+        <div class="flex items-center justify-between gap-2">
           <p class="text-info">
             Forwarding link {editMode ? 'updated' : 'created'}!
           </p>
@@ -187,15 +194,16 @@
             href={`/${name}`}
             target="_blank"
             rel="noreferrer"
-            class="text-accent">try it out</a
+            class="text-accent text-2xl">try it out</a
           >
         </div>
-        <a
-          href={`/?id=${success.id}&name=${success.name}&url=${success.url}`}
-          target="_blank"
-          rel="noreferrer"
-          class="text-primary">Edit Link</a
-        >
+        <div class="flex items-center justify-end gap-2">
+          <p class="text-right">save this link! →</p>
+          <a
+            href={`/?id=${success.id}&name=${success.name}&url=${success.url}`}
+            class="text-secondary text-2xl">Edit Link</a
+          >
+        </div>
       </div>
     {/if}
   </form>

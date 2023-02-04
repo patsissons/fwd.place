@@ -4,7 +4,11 @@ export function errorReason(error: unknown) {
   if (!error) return 'unknown error'
   if (error instanceof Error) return error.message
   if (typeof error === 'string') return error
-  if (typeof error === 'object') return error.toString()
+  if (typeof error === 'object') {
+    if ('message' in error) return String(error.message)
+
+    return error.toString()
+  }
 
   return JSON.stringify(error)
 }
