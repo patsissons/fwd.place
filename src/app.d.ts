@@ -9,9 +9,7 @@ declare global {
   }
 
   interface ImportMetaEnv {
-    VITE_JWT_PRIVATE_KEY: string | undefined
-    VITE_JWT_SUBJECT: string | undefined
-    VITE_THIN_BACKEND_HOST: string | undefined
+    VITE_DATABASE_URL: string | undefined
   }
 }
 

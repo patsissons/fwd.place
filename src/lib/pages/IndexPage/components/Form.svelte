@@ -1,8 +1,8 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
   import Card from 'components/Card.svelte'
+  import type { Forward } from 'data/types'
   import { validation } from 'data/validation'
-  import type { Forward } from 'thin-backend'
   import { errorReason } from 'utils/error'
 
   export let editName: string | undefined = undefined
@@ -194,11 +194,11 @@
             href={`/${name}`}
             target="_blank"
             rel="noreferrer"
-            class="text-accent text-2xl">try it out</a
+            class="text-accent text-2xl">Try it out</a
           >
         </div>
         <div class="flex items-center justify-end gap-2">
-          <p class="text-right">save this link! →</p>
+          <p class="text-right">Save this link! →</p>
           <a
             href={`/?id=${success.id}&name=${success.name}&url=${success.url}`}
             class="text-secondary text-2xl">Edit Link</a

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { goto } from '$app/navigation'
   import { page } from '$app/stores'
   import { create, eligible, update } from 'client/api'
   import { getPageContext } from 'context/page'
@@ -31,6 +32,7 @@
 
   function onClose() {
     view.set('')
+    goto('/')
   }
 
   onMount(() => {

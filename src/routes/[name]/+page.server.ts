@@ -1,6 +1,6 @@
 import { redirect } from '@sveltejs/kit'
 import { dbEnvironment } from 'data/env'
-import { urlByName } from 'server/data/thinDB'
+import { urlByName } from 'server/data'
 import { log } from 'utils/logging'
 import { errorReason, isRedirect } from 'utils/error'
 import type { PageServerLoad } from './$types'

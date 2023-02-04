@@ -1,6 +1,6 @@
 import { error, json } from '@sveltejs/kit'
 import { dbEnvironment } from 'data/env'
-import { createForward } from 'server/data/thinDB'
+import { createForward } from 'server/data'
 import { errorReason, isHttpError } from 'utils/error'
 import { log } from 'utils/logging'
 import type { RequestHandler } from './$types'

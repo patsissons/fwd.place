@@ -1,4 +1,4 @@
-import type { Forward } from 'thin-backend'
+import type { Forward } from 'data/types'
 import { errorReason } from 'utils/error'
 import { log } from 'utils/logging'
 

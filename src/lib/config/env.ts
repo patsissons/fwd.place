@@ -3,12 +3,8 @@
 // general env
 export const NODE_ENV = process.env.NODE_ENV
 
-// auth env
-export const JWT_PRIVATE_KEY = import.meta.env.VITE_JWT_PRIVATE_KEY
-export const JWT_SUBJECT = import.meta.env.VITE_JWT_SUBJECT
-
-// thinDB env
-export const THIN_BACKEND_HOST = import.meta.env.VITE_THIN_BACKEND_HOST
+// prisma env
+export const DATABASE_URL = import.meta.env.VITE_DATABASE_URL
 
 // env transformations
 export const isDevelopment = Boolean(NODE_ENV === 'development')

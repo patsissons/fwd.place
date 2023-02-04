@@ -23,13 +23,13 @@
       href="https://github.com/patsissons/fwd.place">open source</a
     >
     simple URL forwarding service built in
-    <a class="text-accent" href="https://kit.svelte.dev">sveltekit</a>, using
-    the
+    <a class="text-accent" href="https://kit.svelte.dev">SvelteKit</a>, using
     <a class="text-accent" href="https://daisyui.com">DaisyUI components</a>,
     hosted on
-    <a class="text-accent" href="https://vercel.com">vercel</a>, and persisted
-    by
-    <a class="text-accent" href="https://thin.dev">thin backend</a>.
+    <a class="text-accent" href="https://vercel.com">Vercel</a>, with
+    <a class="text-accent" href="https://thin.dev">Thin Backend</a>
+    data persistence, managed through
+    <a class="text-accent" href="https://prisma.io">Prisma</a>.
   </p>
   <p>
     No account or login is required, simply choose a forwarding name (that is
