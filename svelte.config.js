@@ -12,6 +12,7 @@ const config = {
 
     alias: {
       '$styles/*': 'src/styles/*',
+      $houdini: './$houdini',
     },
   },
 }

@@ -11,3 +11,6 @@ vite.config.ts.timestamp-*
 yarn-error.log
 
 *.generated.*
+
+$houdini
+$kitql
