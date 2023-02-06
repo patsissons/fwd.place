@@ -1,0 +1,35 @@
+scalar DateTime
+
+enum Environment {
+  DEVELOPMENT
+  STAGING
+  PRODUCTION
+}
+
+type Forward {
+  id: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  name: String!
+  url: String!
+  environment: Environment!
+}
+
+type Query {
+  url(name: String!, environment: Environment!): String
+}
+
+input SaveOriginalInput {
+  id: String!
+  name: String!
+  url: String!
+}
+
+type Mutation {
+  save(
+    name: String!
+    url: String!
+    environment: Environment!
+    original: SaveOriginalInput
+  ): Forward
+}

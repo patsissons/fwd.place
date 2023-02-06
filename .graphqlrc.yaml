@@ -1,0 +1,6 @@
+projects:
+  default:
+    schema:
+      - ./src/lib/graphql/schema.graphql
+    documents:
+      - '**/*.gql'

@@ -1,0 +1,15 @@
+mutation Save(
+  $name: String!
+  $url: String!
+  $environment: Environment!
+  $original: SaveOriginalInput
+) {
+  save(name: $name, url: $url, environment: $environment, original: $original) {
+    id
+    createdAt
+    updatedAt
+    name
+    url
+    environment
+  }
+}

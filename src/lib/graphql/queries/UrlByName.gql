@@ -1,0 +1,3 @@
+query UrlByName($name: String!, $environment: Environment!) {
+  url(name: $name, environment: $environment)
+}
