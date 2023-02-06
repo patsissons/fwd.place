@@ -1,8 +1,8 @@
 import { error, json } from '@sveltejs/kit'
-import { dbEnvironment } from 'data/env'
-import { createForward } from 'server/data'
-import { errorReason, isHttpError } from 'utils/error'
-import { log } from 'utils/logging'
+import { dbEnvironment } from '$lib/server/data/env'
+import { createForward } from '$lib/server/data'
+import { errorReason, isHttpError } from '$lib/utils/error'
+import { log } from '$lib/utils/logging'
 import type { RequestHandler } from './$types'
 
 export interface Input {

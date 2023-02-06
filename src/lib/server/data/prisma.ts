@@ -1,57 +1,69 @@
-import { PrismaClient } from '@prisma/client'
-import { DATABASE_URL } from 'config/env'
-import type { ThinDBEnvironment } from 'data/env'
-import type { Forward } from 'data/types'
-import { validation } from 'data/validation'
+import { PrismaClient, Environment } from '@prisma/client'
+import { DATABASE_URL } from '$lib/config/env'
+import type { Forward } from '$lib/data/types'
+import { validation } from '$lib/data/validation'
 
-const defaultEnvironment: ThinDBEnvironment = 'production'
+let client: PrismaClient | undefined
+function ensureClient() {
+  if (client) return client
 
-function createClient() {
-  return new PrismaClient({
+  client = new PrismaClient({
     datasources: {
       db: {
         url: DATABASE_URL,
       },
     },
   })
+
+  return client
 }
 
-export async function urlByName(
-  name: string,
-  environment = defaultEnvironment
-) {
-  const client = createClient()
-
-  const result = await client.forwards.findFirst({
-    where: { name, environment },
-    select: {
-      url: true,
-    },
-  })
+async function disposeClient() {
+  if (!client) return
 
   await client.$disconnect()
+}
 
-  return result
+export async function urlByName(name: string, environment: Environment) {
+  const client = ensureClient()
+
+  try {
+    return client.forward.findUnique({
+      where: {
+        name_environment: {
+          name,
+          environment,
+        },
+      },
+      select: {
+        url: true,
+      },
+    })
+  } catch (err) {
+    disposeClient()
+    throw err
+  }
 }
 
 export async function createForward(
   name: string,
   url: string,
-  environment = defaultEnvironment
+  environment: Environment
 ) {
-  const client = createClient()
+  const client = ensureClient()
 
-  const result = await client.forwards.create({
-    data: {
-      name: validation.name(name),
-      url: validation.url(url),
-      environment,
-    },
-  })
-
-  await client.$disconnect()
-
-  return result
+  try {
+    return client.forward.create({
+      data: {
+        name: validation.name(name),
+        url: validation.url(url),
+        environment,
+      },
+    })
+  } catch (err) {
+    disposeClient()
+    throw err
+  }
 }
 
 export interface UpdateForwardOptions {
@@ -62,45 +74,46 @@ export interface UpdateForwardOptions {
 export async function updateForward(
   options: UpdateForwardOptions,
   { id, ...original }: Pick<Forward, 'id' | 'name' | 'url'>,
-  environment = defaultEnvironment
+  environment: Environment
 ) {
-  const name = options.name ? validation.name(options.name) : undefined
-  const url = options.url ? validation.url(options.url) : undefined
+  const client = ensureClient()
 
-  if (!name && !url) throw new Error('Nothing to update')
+  try {
+    const name = options.name ? validation.name(options.name) : undefined
+    const url = options.url ? validation.url(options.url) : undefined
 
-  const client = createClient()
+    if (!name && !url) throw new Error('Nothing to update')
 
-  const current = await client.forwards.findFirst({
-    where: {
-      id,
-      environment,
-    },
-    select: {
-      name: true,
-      url: true,
-    },
-  })
+    const current = await client.forward.findFirst({
+      where: {
+        id,
+        environment,
+      },
+      select: {
+        name: true,
+        url: true,
+      },
+    })
 
-  if (
-    !current ||
-    current.name !== original.name ||
-    current.url !== original.url
-  )
-    throw new Error('Unauthorized update')
+    if (
+      !current ||
+      current.name !== original.name ||
+      current.url !== original.url
+    )
+      throw new Error('Unauthorized update')
 
-  const result = client.forwards.update({
-    data: {
-      name,
-      url,
-      updated_at: new Date().toISOString(),
-    },
-    where: {
-      id,
-    },
-  })
-
-  await client.$disconnect()
-
-  return result
+    return client.forward.update({
+      data: {
+        name,
+        url,
+        updated_at: new Date().toISOString(),
+      },
+      where: {
+        id,
+      },
+    })
+  } catch (err) {
+    disposeClient()
+    throw err
+  }
 }

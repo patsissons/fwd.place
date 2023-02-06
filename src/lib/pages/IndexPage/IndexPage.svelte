@@ -1,8 +1,8 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
   import { page } from '$app/stores'
-  import { create, eligible, update } from 'client/api'
-  import { getPageContext } from 'context/page'
+  import { create, eligible, update } from '$lib/client/api'
+  import { getPageContext } from '$lib/context/page'
   import { onMount } from 'svelte'
   import { Form, InvalidRedirect, Welcome } from './components'
 

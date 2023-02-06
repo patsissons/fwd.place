@@ -1,3 +1,6 @@
+-- CreateEnum
+CREATE TYPE "Environment" AS ENUM ('DEVELOPMENT', 'STAGING', 'PRODUCTION');
+
 -- CreateTable
 CREATE TABLE "Forward" (
     "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
@@ -5,7 +8,7 @@ CREATE TABLE "Forward" (
     "updated_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "name" TEXT NOT NULL,
     "url" TEXT NOT NULL,
-    "environment" TEXT NOT NULL,
+    "environment" "Environment" NOT NULL,
 
     CONSTRAINT "Forward_pkey" PRIMARY KEY ("id")
 );

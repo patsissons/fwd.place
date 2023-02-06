@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { getAppContext } from 'context/app'
-  import { getPageContext } from 'context/page'
+  import { getAppContext } from '$lib/context/app'
+  import { getPageContext } from '$lib/context/page'
   import { ThemeToggle } from './components'
 
   const appContext = getAppContext()
@@ -12,7 +12,9 @@
 
 <div class="navbar items-stretch bg-base-300">
   <div class="flex-none justify-start gap-4">
-    <a class="btn btn-ghost" href={origin}>fwd.place</a>
+    <a class="btn btn-ghost" href={origin} on:click={pageContext.onHome}
+      >fwd.place</a
+    >
     <p class="hidden min-[480px]:block">Stupidly simple url forwarding</p>
   </div>
 

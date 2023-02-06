@@ -1,5 +1,5 @@
 import { getContext, setContext } from 'svelte'
-import { isStaging } from 'utils/url'
+import { isStaging } from '$lib/utils/url'
 import type { LoadContext } from './load'
 
 export interface AppContext {

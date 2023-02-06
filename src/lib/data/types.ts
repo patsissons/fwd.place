@@ -1,1 +1,1 @@
-export type { forwards as Forward } from '@prisma/client'
+export type { Forward } from '@prisma/client'

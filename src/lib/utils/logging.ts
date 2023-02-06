@@ -1,4 +1,4 @@
-import { isDevelopment } from 'config/env'
+import { isDevelopment } from '$lib/config/env'
 import { isStaging } from './url'
 
 export function log(message: string, context?: unknown, type = 'D') {

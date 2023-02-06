@@ -1,6 +1,6 @@
 <script lang="ts">
-  import Card from 'components/Card.svelte'
-  import { getPageContext } from 'context/page'
+  import Card from '$lib/components/Card.svelte'
+  import { getPageContext } from '$lib/context/page'
 
   const pageContext = getPageContext()
   const view = pageContext.store<string>('view')

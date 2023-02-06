@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { createAppContext } from 'context/app'
-  import type { LoadContext } from 'context/load'
-  import { createPageContext, type PageContextData } from 'context/page'
-  import 'styles/global.css'
+  import '$styles/global.css'
+  import { createAppContext } from '$lib/context/app'
+  import type { LoadContext } from '$lib/context/load'
+  import { createPageContext, type PageContextData } from '$lib/context/page'
 
   export let load: LoadContext
   export let page: PageContextData | undefined = undefined

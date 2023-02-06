@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getAppContext } from 'context/app'
+  import { getAppContext } from '$lib/context/app'
   import Navbar from './Navbar'
 
   const context = getAppContext()

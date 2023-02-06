@@ -1,6 +1,6 @@
-import type { Forward } from 'data/types'
-import { errorReason } from 'utils/error'
-import { log } from 'utils/logging'
+import type { Forward } from '$lib/data/types'
+import { errorReason } from '$lib/utils/error'
+import { log } from '$lib/utils/logging'
 
 export function eligible(name: string) {
   return request<{ name: string }>('eligible', { name })

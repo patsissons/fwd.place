@@ -11,11 +11,13 @@ export interface PageAction {
 export interface PageContextData {
   actions?: Record<string, PageAction>
   stores?: Record<string, Writable<unknown>>
+  onHome?(): unknown
 }
 
 export interface PageContext {
   actions: Record<string, PageAction>
   store<T>(name: string): Writable<T>
+  onHome?(): unknown
 }
 
 const PageContextKey = 'page'
@@ -23,10 +25,12 @@ const PageContextKey = 'page'
 export function createPageContext({
   actions = {},
   stores = {},
+  onHome,
 }: PageContextData = {}) {
   return setContext<PageContext>(PageContextKey, {
     actions,
     store,
+    onHome,
   })
 
   function store<T>(name: string) {

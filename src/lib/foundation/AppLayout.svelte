@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type { LoadContext } from 'context/load'
-  import type { PageContextData } from 'context/page'
-  import 'styles/global.css'
+  import '$styles/global.css'
+  import type { LoadContext } from '$lib/context/load'
+  import type { PageContextData } from '$lib/context/page'
   import AppContext from './AppContext.svelte'
   import AppFrame from './AppFrame.svelte'
 

@@ -4,8 +4,8 @@ async function seed() {
   const client = new PrismaClient()
 
   try {
-    await upsertForEnvironment('development')
-    await upsertForEnvironment('staging')
+    await upsertForEnvironment('DEVELOPMENT')
+    await upsertForEnvironment('STAGING')
   } catch (err) {
     console.error(err)
   } finally {
@@ -35,14 +35,14 @@ const testForward: Pick<Forward, 'name' | 'url'> = {
   url: 'https://butt.holdings',
 }
 
-type DBEnvironment = 'development' | 'staging'
+type DBEnvironment = 'DEVELOPMENT' | 'STAGING'
 
 const seedData = {
-  development: {
+  DEVELOPMENT: {
     ...testForward,
     id: '00000000-0000-0000-0000-100000000001',
   },
-  staging: {
+  STAGING: {
     ...testForward,
     id: '00000000-0000-0000-0000-200000000001',
   },

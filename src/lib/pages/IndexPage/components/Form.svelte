@@ -1,9 +1,10 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
-  import Card from 'components/Card.svelte'
-  import type { Forward } from 'data/types'
-  import { validation } from 'data/validation'
-  import { errorReason } from 'utils/error'
+  import Card from '$lib/components/Card.svelte'
+  import TextInput from '$lib/components/TextInput.svelte'
+  import type { Forward } from '$lib/data/types'
+  import { validation } from '$lib/data/validation'
+  import { errorReason } from '$lib/utils/error'
 
   export let editName: string | undefined = undefined
   export let editUrl: string | undefined = undefined
@@ -13,55 +14,32 @@
   export let onClose: () => unknown
 
   let name: string = editName || '',
-    nameError: string | undefined,
-    validatingName = false,
-    nameValidated = false
+    nameInvalid = false,
+    nameValidating = false
   let url: string = editUrl || '',
-    urlError: string | undefined,
-    validatingUrl = false
+    urlInvalid = false,
+    urlValidating = false
   let error: string | undefined
   let success: Forward | undefined
   let saving = false
 
   const editMode = Boolean(editName && editUrl)
 
-  $: validating = validatingName || validatingUrl
-  $: invalid = Boolean(nameError || urlError || (!name && !url))
+  $: validating = nameValidating || urlValidating
+  $: invalid = nameInvalid || urlInvalid
 
   async function validateName() {
-    try {
-      validatingName = true
-      nameValidated = false
-      nameError = undefined
-
-      validation.name(name)
-
-      if (name !== editName) await nameEligible(name)
-
-      nameValidated = true
-    } catch (err) {
-      nameError = errorReason(err)
-    } finally {
-      validatingName = false
-    }
+    validation.name(name)
+    if (name !== editName) await nameEligible(name)
   }
 
   function validateUrl() {
-    try {
-      validatingUrl = true
-      urlError = undefined
-
-      validation.url(url)
-    } catch (err) {
-      urlError = errorReason(err)
-    } finally {
-      validatingUrl = false
-    }
+    validation.url(url)
   }
 
   async function handleSubmit() {
     try {
-      if (nameError || urlError) return
+      if (invalid) return
 
       saving = true
       error = undefined
@@ -104,78 +82,20 @@
     </button>
   </div>
   <form on:submit|preventDefault={handleSubmit} class="space-y-6">
-    <div class="flex flex-col gap-2">
-      <label for="name" class="input-label">Name</label>
-      <div class="flex gap-2">
-        <input
-          bind:value={name}
-          on:blur={validateName}
-          type="text"
-          name="name"
-          id="name"
-          class="input w-full"
-          class:input-error={nameError}
-          aria-label="forwarding name"
-          placeholder="some-name (→ fwd.place/some-name)"
-          required
-          disabled={saving || validatingName}
-        />
-        {#if validatingName}
-          <div class="btn btn-ghost loading pointer-events-none" />
-        {:else if nameValidated}
-          <div class="btn btn-success pointer-events-none">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="stroke-current flex-shrink-0 h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              ><path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
-        {:else if nameError}
-          <div class="btn btn-error pointer-events-none">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="stroke-current flex-shrink-0 h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              ><path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
-        {/if}
-      </div>
-      {#if nameError}
-        <p class="text-error">{nameError}</p>
-      {/if}
-    </div>
-    <div class="flex flex-col gap-2">
-      <label for="url" class="input-label">URL</label>
-      <input
-        bind:value={url}
-        on:blur={validateUrl}
-        type="text"
-        name="url"
-        id="url"
-        class="input w-full"
-        aria-label="forwarding URL"
-        placeholder="https://butt.holdings/"
-        required
-        disabled={saving || validatingUrl}
-      />
-      {#if urlError}
-        <p class="text-error">{urlError}</p>
-      {/if}
-    </div>
+    <TextInput
+      bind:value={name}
+      bind:validating={nameValidating}
+      bind:invalid={nameInvalid}
+      {saving}
+      onValidate={validateName}
+    />
+    <TextInput
+      bind:value={url}
+      bind:validating={urlValidating}
+      bind:invalid={urlInvalid}
+      {saving}
+      onValidate={validateUrl}
+    />
     <button
       type="submit"
       disabled={saving || invalid || validating}

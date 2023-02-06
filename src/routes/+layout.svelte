@@ -1,6 +1,6 @@
 <script lang="ts">
-  import type { PageContextData } from 'context/page'
-  import AppLayout from 'foundation/AppLayout.svelte'
+  import type { PageContextData } from '$lib/context/page'
+  import AppLayout from '$lib/foundation/AppLayout.svelte'
   import { writable } from 'svelte/store'
   import type { LayoutData } from './$types'
 
@@ -21,6 +21,9 @@
     },
     stores: {
       view,
+    },
+    onHome() {
+      view.set('')
     },
   }
 </script>
