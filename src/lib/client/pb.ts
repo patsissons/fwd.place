@@ -88,17 +88,22 @@ export const fwds = {
     fwdStore.set(list);
     return list;
   },
-  create(fwd: NewRecord<Fwd>) {
-    return createClient().collection('fwds').create<Fwd>(fwd);
+  async create(fields: NewRecord<Fwd>) {
+    const fwd = await createClient().collection('fwds').create<Fwd>(fields);
+    await fwds.byAuth();
+    return fwd;
   },
-  delete(id: string) {
-    return createClient().collection('fwds').delete(id);
+  async delete(id: string) {
+    const deleted = await createClient().collection('fwds').delete(id);
+    if (deleted) {
+      await fwds.byAuth();
+    }
+
+    return deleted;
   },
   async update(id: string, fields: Partial<Fwd>) {
     const fwd = await createClient().collection('fwds').update<Fwd>(id, fields);
-
     await fwds.byAuth();
-
     return fwd;
   },
 };

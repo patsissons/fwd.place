@@ -22,10 +22,8 @@
     if (!id) return;
 
     const fields = { name };
-    console.log('submitting user change', fields);
 
     const user = await users.update(id, fields);
-    console.log('user', user);
     open = false;
   }
 </script>

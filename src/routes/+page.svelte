@@ -1,12 +1,15 @@
 <script lang="ts">
   import * as Accordion from '$lib/components/ui/accordion';
   import { Button } from '$lib/components/ui/button';
-  import { users } from '$lib/client/pb';
+  import { fwds, users } from '$lib/client/pb';
   import { fwdStore } from '$lib/stores/fwdStore';
   import { userStore } from '$lib/stores/userStore';
   import { onMount } from 'svelte';
+  import { Input } from '$lib/components/ui/input';
 
   let loaded = false;
+  let name = '',
+    url = '';
 
   onMount(async () => {
     const user = await users.current();
@@ -18,32 +21,61 @@
   function handleAuth() {
     users.login('github').catch(console.error);
   }
+
+  function handleDelete(id: string) {
+    fwds.delete(id).catch(console.error);
+  }
+
+  function handleCreate() {
+    const user = $userStore?.id;
+    if (!name || !url || !user) return;
+
+    fwds
+      .create({ name, url, enabled: true, public: true, user })
+      .then((fwd) => {
+        name = '';
+        url = '';
+      })
+      .catch(console.error);
+  }
 </script>
 
 <main class="container mx-auto h-full max-w-screen-lg">
   {#if $userStore}
-    <Accordion.Root>
-      {#each $fwdStore as fwd}
-        <Accordion.Item value={fwd.id}>
-          <Accordion.Trigger>
-            <div class="grid w-full grid-cols-[1fr,auto,1fr] items-center gap-1 px-2">
-              <span class="justify-self-start">{$userStore.name}/{fwd.name}</span>
-              <span class="justify-self-center">→</span>
-              <span class="justify-self-end">{fwd.url}</span>
-            </div>
-          </Accordion.Trigger>
-          <Accordion.Content>
-            <div class="bg-muted">
-              <pre class="bg-slate-800 p-4 font-mono text-slate-200">{JSON.stringify(
-                  fwd,
-                  null,
-                  2,
-                )}</pre>
-            </div>
-          </Accordion.Content>
-        </Accordion.Item>
-      {/each}
-    </Accordion.Root>
+    <div class="flex flex-col items-center gap-4">
+      <div class="w-full max-w-lg">
+        <form class="flex flex-col gap-2 py-2" on:submit|preventDefault={handleCreate}>
+          <Input placeholder="Name" bind:value={name} />
+          <Input placeholder="Url" bind:value={url} />
+          <Button type="submit">Create</Button>
+        </form>
+      </div>
+      <Accordion.Root class="w-full">
+        {#each $fwdStore as fwd (fwd.id)}
+          <Accordion.Item value={fwd.id}>
+            <Accordion.Trigger>
+              <div class="grid w-full grid-cols-[1fr,auto,1fr] items-center gap-1 px-2">
+                <span class="justify-self-start">{$userStore.name}/{fwd.name}</span>
+                <span class="justify-self-center">→</span>
+                <span class="justify-self-end">{fwd.url}</span>
+              </div>
+            </Accordion.Trigger>
+            <Accordion.Content>
+              <div class="flex flex-col gap-1">
+                <div class="bg-muted">
+                  <pre class="bg-slate-800 p-4 font-mono text-slate-200">{JSON.stringify(
+                      fwd,
+                      null,
+                      2,
+                    )}</pre>
+                </div>
+                <Button variant="destructive" on:click={() => handleDelete(fwd.id)}>Delete</Button>
+              </div>
+            </Accordion.Content>
+          </Accordion.Item>
+        {/each}
+      </Accordion.Root>
+    </div>
   {:else if loaded}
     <div class="grid h-full place-items-center">
       <Button class="flex items-center gap-2" on:click={handleAuth}>
