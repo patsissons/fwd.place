@@ -7,14 +7,26 @@
   import { userStore } from '$lib/stores/userStore';
   import { users } from '$lib/client/pb';
 
+  let open = false;
   let name = '';
 
   $: if ($userStore && !name) {
     name = $userStore.name;
   }
+  $: if (!$userStore) {
+    name = '';
+  }
 
-  function handleSubmit() {
-    console.log('submit', name);
+  async function handleSubmit() {
+    const id = $userStore?.id;
+    if (!id) return;
+
+    const fields = { name };
+    console.log('submitting user change', fields);
+
+    const user = await users.update(id, fields);
+    console.log('user', user);
+    open = false;
   }
 </script>
 
@@ -40,9 +52,11 @@
     </div>
     <div class="justify-self-end pr-2">
       {#if $userStore}
-        <Dialog.Root>
-          <Dialog.Trigger>
-            <Avatar.Root class="border-2 border-transparent hover:border-fuchsia-500">
+        <Dialog.Root bind:open>
+          <Dialog.Trigger
+            class="rounded-full border-2 border-transparent outline-fuchsia-500 hover:border-fuchsia-500"
+          >
+            <Avatar.Root>
               <Avatar.Image src={$userStore.avatar} alt={$userStore.username} />
               <Avatar.Fallback>{$userStore.username.slice(0, 2)}</Avatar.Fallback>
             </Avatar.Root>
@@ -51,7 +65,9 @@
             <form on:submit|preventDefault={handleSubmit}>
               <Dialog.Header>
                 <Dialog.Title>{$userStore.email}</Dialog.Title>
-                <Dialog.Description>Change your profile name here.</Dialog.Description>
+                <Dialog.Description
+                  >Change your profile name, used as the prefix to the url forwarding path.</Dialog.Description
+                >
               </Dialog.Header>
               <div class="my-2">
                 <Input placeholder="name" bind:value={name} />
