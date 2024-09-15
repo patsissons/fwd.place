@@ -1,31 +1,50 @@
-<script>
-  import Link from '$lib/link.svelte';
+<script lang="ts">
+  import * as Accordion from '$lib/components/ui/accordion';
+  import { users } from '$lib/client/pb';
+  import { fwdStore } from '$lib/stores/fwdStore';
+  import { userStore } from '$lib/stores/userStore';
+  import { onMount } from 'svelte';
+
+  let loaded = false;
+
+  onMount(async () => {
+    await users.current();
+
+    loaded = true;
+  });
+
+  function handleAuth() {
+    users.login('github').catch(console.error);
+  }
 </script>
 
-<main class="grid min-h-screen place-content-center">
-  <div class="flex max-w-xl flex-col gap-4 rounded-xl bg-slate-900/10 p-6 shadow-xl">
-    <h1 class="text-center text-xl font-bold">Welcome to SvelteKit + Tailwind CSS starter kit</h1>
-    <section class="flex flex-col gap-2">
-      <p>
-        This is a starter template for building a <Link href="https://kit.svelte.dev/" external
-          >SvelteKit</Link
-        > app with <Link href="https://tailwindcss.com/" external>Tailwind CSS</Link>.
-      </p>
-      <p>Run the following commands to set it up:</p>
-      <code class="overflow-x-auto overflow-y-hidden rounded-md bg-slate-900 p-2 text-slate-200">
-        <pre class="whitespace-pre">pnpm create svelte@latest sveltekit-tailwindcss-starter
-cd sveltekit-tailwindcss-starter
-git init
-pnpx svelte-add@latest tailwindcss --tailwindcss-typography
-pnpm upgrade --latest</pre>
-      </code>
-      <p>
-        Then edit your <code class="mx-1 rounded-sm bg-slate-900 px-1 py-0.5 text-slate-200"
-          >.prettierrc</code
-        >
-        to your liking and run
-        <code class="mx-1 rounded-sm bg-slate-900 px-1 py-0.5 text-slate-200">pnpm format</code>
-      </p>
-    </section>
-  </div>
+<main class="container mx-auto max-w-screen-lg">
+  {#if $userStore}
+    <!-- {#each $fwdStore as fwd}
+      <pre>{JSON.stringify(fwd, null, 2)}</pre>
+    {/each} -->
+    <Accordion.Root>
+      {#each $fwdStore as fwd}
+        <Accordion.Item value={fwd.id}>
+          <Accordion.Trigger
+            >{$userStore.name || $userStore.id}/{fwd.name} → {fwd.url}</Accordion.Trigger
+          >
+          <Accordion.Content>
+            <pre>{JSON.stringify(fwd, null, 2)}</pre>
+          </Accordion.Content>
+        </Accordion.Item>
+      {/each}
+    </Accordion.Root>
+  {:else if loaded}
+    <button class="flex items-center gap-2" on:click={handleAuth}>
+      <svg aria-label="github" height="20" viewBox="0 0 14 14" width="20">
+        <path
+          d="M7 .175c-3.872 0-7 3.128-7 7 0 3.084 2.013 5.71 4.79 6.65.35.066.482-.153.482-.328v-1.181c-1.947.415-2.363-.941-2.363-.941-.328-.81-.787-1.028-.787-1.028-.634-.438.044-.416.044-.416.7.044 1.071.722 1.071.722.635 1.072 1.641.766 2.035.59.066-.459.24-.765.437-.94-1.553-.175-3.193-.787-3.193-3.456 0-.766.262-1.378.721-1.881-.065-.175-.306-.897.066-1.86 0 0 .59-.197 1.925.722a6.754 6.754 0 0 1 1.75-.24c.59 0 1.203.087 1.75.24 1.335-.897 1.925-.722 1.925-.722.372.963.131 1.685.066 1.86.46.48.722 1.115.722 1.88 0 2.691-1.641 3.282-3.194 3.457.24.219.481.634.481 1.29v1.926c0 .197.131.415.481.328C11.988 12.884 14 10.259 14 7.175c0-3.872-3.128-7-7-7z"
+          fill="currentColor"
+          fill-rule="nonzero"
+        />
+      </svg>
+      <span>Continue with GitHub</span>
+    </button>
+  {/if}
 </main>
