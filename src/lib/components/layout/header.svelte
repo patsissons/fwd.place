@@ -1,11 +1,14 @@
 <script lang="ts">
   import LogoGithubIcon from '~icons/ion/logo-github';
+  import AddCircleIcon from '~icons/ion/add-circle';
   import { Button } from '$lib/components/ui/button';
   import * as Avatar from '$lib/components/ui/avatar';
   import * as Dialog from '$lib/components/ui/dialog';
   import { Input } from '$lib/components/ui/input';
   import { userStore } from '$lib/stores/userStore';
   import { users } from '$lib/client/pb';
+  import UserDialog from './user-dialog.svelte';
+  import AddDialog from '../fwd-dialog.svelte';
 
   let open = false;
   let name = '';
@@ -26,6 +29,10 @@
     const user = await users.update(id, fields);
     open = false;
   }
+
+  function handleAdd() {
+    // ...
+  }
 </script>
 
 <header class="h-14">
@@ -33,12 +40,12 @@
     <div class="justify-self-start pl-2">
       <Button
         class="aspect-square bg-gradient-to-br from-sky-500 to-fuchsia-500 p-0"
-        variant="ghost"
+        variant="outline"
         href="https://github.com/patsissons/fwd.place"
         target="_blank"
         rel="noopener noreferrer"
       >
-        <LogoGithubIcon width={24} height={24} />
+        <LogoGithubIcon class="size-6" />
       </Button>
     </div>
     <div class="container mx-auto place-self-center">
@@ -50,33 +57,10 @@
     </div>
     <div class="justify-self-end pr-2">
       {#if $userStore}
-        <Dialog.Root bind:open>
-          <Dialog.Trigger
-            class="rounded-full border-2 border-transparent outline-fuchsia-500 hover:border-fuchsia-500"
-          >
-            <Avatar.Root>
-              <Avatar.Image src={$userStore.avatar} alt={$userStore.username} />
-              <Avatar.Fallback>{$userStore.username.slice(0, 2)}</Avatar.Fallback>
-            </Avatar.Root>
-          </Dialog.Trigger>
-          <Dialog.Content>
-            <form on:submit|preventDefault={handleSubmit}>
-              <Dialog.Header>
-                <Dialog.Title>{$userStore.email}</Dialog.Title>
-                <Dialog.Description
-                  >Change your profile name, used as the prefix to the url forwarding path.</Dialog.Description
-                >
-              </Dialog.Header>
-              <div class="my-2">
-                <Input placeholder="name" bind:value={name} />
-              </div>
-              <Dialog.Footer>
-                <Button variant="destructive" on:click={users.logout}>Logout</Button>
-                <Button type="submit">Save changes</Button>
-              </Dialog.Footer>
-            </form>
-          </Dialog.Content>
-        </Dialog.Root>
+        <div class="flex items-center justify-end">
+          <AddDialog user={$userStore} />
+          <UserDialog user={$userStore} />
+        </div>
       {/if}
     </div>
   </div>
