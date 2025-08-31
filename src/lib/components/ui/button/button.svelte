@@ -2,6 +2,7 @@
 	import { Button as ButtonPrimitive } from "bits-ui";
 	import { type Events, type Props, buttonVariants } from "./index.js";
 	import { cn } from "$lib/utils.js";
+	import { type ClassNameValue } from "tailwind-merge";
 
 	type $$Props = Props;
 	type $$Events = Events;
@@ -15,7 +16,7 @@
 
 <ButtonPrimitive.Root
 	{builders}
-	class={cn(buttonVariants({ variant, size, className }))}
+	class={cn(buttonVariants({ variant, size, className: className as ClassNameValue }))}
 	type="button"
 	{...$$restProps}
 	on:click
