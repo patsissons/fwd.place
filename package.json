@@ -17,6 +17,7 @@
     "format": "prettier --write ."
   },
   "devDependencies": {
+    "@eslint/js": "^9.10.0",
     "@iconify/json": "^2.2.245",
     "@sveltejs/adapter-auto": "^6.1.0",
     "@sveltejs/kit": "^2.31.1",
